@@ -1,0 +1,40 @@
+#!/bin/bash
+
+echo "Running pre-commit checks..."
+
+# 1. Format Check
+echo "Running dotnet format..."
+dotnet format --verify-no-changes
+if [ $? -ne 0 ]; then
+  echo "dotnet format failed. Please run 'dotnet format' to fix."
+  exit 1
+fi
+
+# 2. Dependency Check on Core Project
+CORE_CSPROJ="src/DomainCopilot.Core/DomainCopilot.Core.csproj"
+if [ -f "$CORE_CSPROJ" ]; then
+  echo "Checking DomainCopilot.Core for forbidden references..."
+  
+  # Check for ProjectReference
+  if grep -qi "<ProjectReference" "$CORE_CSPROJ"; then
+    echo "ERROR: DomainCopilot.Core must not contain any <ProjectReference>."
+    exit 1
+  fi
+
+  # Check for PackageReference (Excluding potential base .NET attributes if any, but enforcing no external packages)
+  if grep -qi "<PackageReference" "$CORE_CSPROJ"; then
+    echo "ERROR: DomainCopilot.Core contains <PackageReference>. Core must have ZERO NuGet packages beyond base .NET."
+    exit 1
+  fi
+fi
+
+# 3. Tests
+echo "Running dotnet test..."
+dotnet test
+if [ $? -ne 0 ]; then
+  echo "Tests failed. Please fix before committing."
+  exit 1
+fi
+
+echo "Pre-commit checks passed!"
+exit 0
