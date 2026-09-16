@@ -82,15 +82,3 @@ When writing tests:
 1. Only write tests for the class requested. Do not unnecessarily refactor the class itself unless it's broken.
 2. Any LLM calls or external dependencies MUST be stubbed or mocked. Never make real network or LLM calls in tests.
 3. Follow the repository's testing conventions.
-
-### Angular Frontend Rules
-When writing or scaffolding Angular code, ALWAYS follow this directory structure and workflow:
-1. **File Structure**: Components must consist of 3 files (`.html`, `.scss`/`.css`, `.ts`).
-2. **Components**: Place all feature/UI components in `frontend/src/app/components`.
-3. **Core**: Place all interfaces, services, interceptors, and guards in `frontend/src/app/core`.
-4. **Layouts**: Place layout components (e.g., Auth layout, Normal/Main layout) in `frontend/src/app/layout`.
-5. **Workflow**:
-   - Define the data contract from the backend as an `Interface` in the `core` folder.
-   - Create a `Service` in the `core` folder to fetch/receive the data.
-   - Inject the service into the Component and build the UI design.
-6. **Routing**: Always update the routing module/config to reflect new components and layouts.
