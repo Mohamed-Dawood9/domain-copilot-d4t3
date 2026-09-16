@@ -82,3 +82,8 @@ When writing tests:
 1. Only write tests for the class requested. Do not unnecessarily refactor the class itself unless it's broken.
 2. Any LLM calls or external dependencies MUST be stubbed or mocked. Never make real network or LLM calls in tests.
 3. Follow the repository's testing conventions.
+
+### Logging AI Usage
+Whenever the AI copilot modifies an existing file or creates a new file, it MUST immediately update `docs/AI-USAGE-LOG.md`. 
+1. Keep the log extremely honest and humanized, explaining exactly what the AI was delegated to do, any mistakes it made, and how it was corrected.
+2. Do not add boilerplate or unnecessary information; only log the actual file changes and real developer context.
