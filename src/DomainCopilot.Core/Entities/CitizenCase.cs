@@ -13,6 +13,9 @@ public class CitizenCase : BaseEntity
 
     public CitizenCase(string description)
     {
+        if (string.IsNullOrWhiteSpace(description))
+            throw new ArgumentException("Description cannot be null or empty.", nameof(description));
+
         Description = description;
         Status = CaseStatus.Open;
         CreatedAt = DateTime.UtcNow;
