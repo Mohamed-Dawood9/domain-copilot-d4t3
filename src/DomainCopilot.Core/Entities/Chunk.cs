@@ -5,15 +5,20 @@ namespace DomainCopilot.Core.Entities;
 public class Chunk : BaseEntity
 {
     public Guid DocumentRecordId { get; private set; }
-    public string Text { get; private set; }
-    public float[] Embedding { get; private set; }
+    public string Content { get; private set; }
+    public int ChunkIndex { get; private set; }
+    public string EmbeddingId { get; private set; }
     public int TokenCount { get; private set; }
 
-    public Chunk(Guid documentRecordId, string text, float[] embedding, int tokenCount)
+    // Navigation property for EF Core
+    public DocumentRecord DocumentRecord { get; private set; }
+
+    public Chunk(Guid documentRecordId, string content, int chunkIndex, string embeddingId, int tokenCount)
     {
         DocumentRecordId = documentRecordId;
-        Text = text;
-        Embedding = embedding;
+        Content = content;
+        ChunkIndex = chunkIndex;
+        EmbeddingId = embeddingId;
         TokenCount = tokenCount;
     }
 }

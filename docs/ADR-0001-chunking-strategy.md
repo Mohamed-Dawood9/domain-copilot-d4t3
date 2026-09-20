@@ -1,11 +1,19 @@
-# ADR 0001: Sliding Window Chunking Strategy
+# ADR 0001: Chunking Strategy for Government Corpus
 
-- **Title**: Sliding Window Chunking for Policy Documents
-- **Context**: Government policy documents are lengthy and highly structured. Standard fixed-size chunking often splits critical context (like a rule and its exceptions) across two separate chunks, leading to hallucinations or incomplete answers during the RAG retrieval phase.
-- **Decision**: We will implement a sliding window chunking strategy (e.g., 512 tokens per chunk with a 128-token overlap) for all documents ingested into Qdrant. 
-- **Alternatives Considered**: 
-  - *Fixed-size chunking (no overlap)*: Rejected due to the high risk of losing semantic context at chunk boundaries.
-  - *Semantic/Sentence chunking*: Rejected because it is computationally expensive to parse complex government PDF layouts perfectly into semantic sentences at scale without a dedicated layout parser.
-- **Consequences**: 
-  - **Easier**: Retrieving complete contextual rules; the LLM will have the overlap necessary to understand cross-boundary concepts.
-  - **More difficult**: Ingestion logic becomes slightly more complex, and storage requirements in Qdrant will increase by roughly 25% due to the redundant overlapped text.
+## Context
+Our municipal corpus consists of heavily structured legal regulations, detailed fee schedule tables, and semi-structured prose like FAQs and procedural guidance. The requirement is to maintain structural integrity so that clause numbers are kept together, and critical relationships (like a fee amount and its effective date) are never split across chunks, which would otherwise introduce hallucination risks during retrieval.
+
+## Decision
+We will employ a dual-strategy chunking approach:
+1. **Structural Chunking**: Used for regulations, procedures, and fee schedules. We split on markdown headers, numbered clauses, and table rows. For fee schedules specifically, each chunk is enforced to contain a complete fee-amount-plus-effective-date pair to completely defend against the D4 version drift risk.
+2. **Sliding Window Chunking**: Used for FAQs and prose documents. We use a token/word window of 500 words with a 15% overlap (~75 words) to ensure context boundary continuity.
+
+In all cases, chunks will be prefixed with a context header containing the Document ID, Section Title, Page Number, Version, and Effective Date.
+
+## Alternatives Considered
+- **Fixed-size chunking across the board**: Rejected. A pure fixed-size chunking approach (e.g., 500 tokens for everything) would arbitrarily slice fee schedule tables, likely separating a fee amount on one line from its effective date on another line. This is the exact risk called out in the Day 1 requirements (Version/Date drift).
+- **Semantic chunking (LLM-based)**: Rejected for now due to cost and latency during the ingestion phase, though it provides superior boundaries.
+
+## Consequences
+- **Easier**: Retrieval accuracy for fee schedules is significantly improved because queries for specific fees will reliably pull the effective date along with the amount.
+- **More difficult**: The ingestion pipeline must dynamically select the correct chunker based on the document type or directory, adding slight complexity to the orchestrator.
