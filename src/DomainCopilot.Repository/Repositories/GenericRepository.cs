@@ -2,33 +2,42 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DomainCopilot.Core.Repositories.Contract;
+using DomainCopilot.Repository.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace DomainCopilot.Repository.Repositories;
 
 public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
-    public Task<T?> GetByIdAsync(Guid id)
+    private readonly AppDbContext _context;
+
+    public GenericRepository(AppDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public Task<IReadOnlyList<T>> ListAllAsync()
+    public async Task<T?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _context.Set<T>().FindAsync(id);
     }
 
-    public Task AddAsync(T entity)
+    public async Task<IReadOnlyList<T>> ListAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Set<T>().ToListAsync();
+    }
+
+    public async Task AddAsync(T entity)
+    {
+        await _context.Set<T>().AddAsync(entity);
     }
 
     public void Update(T entity)
     {
-        throw new NotImplementedException();
+        _context.Set<T>().Update(entity);
     }
 
     public void Delete(T entity)
     {
-        throw new NotImplementedException();
+        _context.Set<T>().Remove(entity);
     }
 }

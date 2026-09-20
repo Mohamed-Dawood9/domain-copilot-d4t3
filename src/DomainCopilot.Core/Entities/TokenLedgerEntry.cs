@@ -11,6 +11,8 @@ public class TokenLedgerEntry : BaseEntity
     public string ModelUsed { get; private set; }
     public DateTime Timestamp { get; private set; }
 
+    private TokenLedgerEntry() { }
+
     public TokenLedgerEntry(Guid budgetId, int tokensUsed, Money cost, string modelUsed)
     {
         BudgetId = budgetId;

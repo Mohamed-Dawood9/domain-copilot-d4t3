@@ -10,6 +10,8 @@ public class Budget : BaseEntity
     public Money Spent { get; private set; }
     public int TotalTokensUsed { get; private set; }
 
+    private Budget() { }
+
     public Budget(string userId, Money allocated)
     {
         UserId = userId;

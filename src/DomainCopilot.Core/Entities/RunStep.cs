@@ -13,6 +13,8 @@ public class RunStep : BaseEntity
     public DateTime Timestamp { get; private set; }
     public string ActionTaken { get; private set; }
 
+    private RunStep() { }
+
     public RunStep(Guid agentRunId, string agentName, string modelUsed, int tokensUsed, Money cost, string actionTaken)
     {
         AgentRunId = agentRunId;
